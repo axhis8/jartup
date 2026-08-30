@@ -7,7 +7,7 @@ from pathlib import Path
 
 CACHED_DIR_SUFFIX = "_cached"
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="[Jartup] %(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -30,10 +30,12 @@ def validate_template(template_path: Path, filename: str) -> Path:
     return file
 
 
-def rollback(error_msg: str, root: Path, old_dir_exists: bool):
+def rollback(
+    error_msg: str, root: Path, old_dir_exists: bool, root_is_created: bool = True
+):
     logger.error(error_msg)
 
-    if root.exists():
+    if root.exists() and root_is_created:
         logger.info(f"Cleaning up created directory '{root}'...")
         shutil.rmtree(root)
 
@@ -85,9 +87,10 @@ def main():
 
     old_dir_cached = False
     if root.exists() and not args.force:
-        rollback(f"Project '{args.name}' already exists!", root, old_dir_cached)
+        rollback(f"Project '{args.name}' already exists!", root, old_dir_cached, False)
 
     elif root.exists() and args.force:
+        logging.info(f"Directory '{args.name}' already exists")
         cache_old_dir(root)
         old_dir_cached = True
 
@@ -155,7 +158,7 @@ def main():
     except FileNotFoundError as e:
         rollback(f"Error during project creation: {e}", root, old_dir_cached)
 
-    # WRITING IN FILES
+    # WRITING IN FILES - TODO
     logger.info("Writing in Files...")
 
     # CLEAN UP
