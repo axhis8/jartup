@@ -20,6 +20,7 @@ def cache_old_dir(root):
             f"Path {cached_path} already exists! Rename the existing file to fix this issue.",
             root,
             False,
+            False,
         )
 
     shutil.move(root, get_cached_path(root))
