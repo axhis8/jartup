@@ -8,7 +8,7 @@ Small Python script that scaffolds a Maven Java project with folder structure, `
 
 - Standard folder structure (`src/main/java`, `src/test/java`, `src/main/resources`) based on the group ID
 - `pom.xml` with group ID, artifact ID, and a Maven Jar Plugin configured to build a directly runnable JAR
-- `Main.java` with a Hello World starter
+- `Main.java`
 - Maven Wrapper (`mvnw`/`mvnw.cmd`), so nobody needs Maven installed globally
 - optional: Git repo (`--git`)
 - optional: Dockerfile + docker-compose + .dockerignore (`--docker`)
@@ -21,6 +21,7 @@ Clone the repo:
 
 ```bash
 git clone https://github.com/axhislmc/jartup.git
+cd jartup/
 ```
 
 Make it executable and available globally:
