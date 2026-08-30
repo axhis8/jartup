@@ -13,6 +13,15 @@ logger = logging.getLogger(__name__)
 
 def cache_old_dir(root):
     logger.info("Backing up existing project...")
+    cached_path = get_cached_path(root)
+
+    if cached_path.exists():
+        rollback(
+            f"Path {cached_path} already exists! Rename the existing file to fix this issue.",
+            root,
+            False,
+        )
+
     shutil.move(root, get_cached_path(root))
 
 
