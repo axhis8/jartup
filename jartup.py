@@ -85,6 +85,13 @@ def main():
         help="initialize docker (also sets up maven build)",
     )
     parser.add_argument(
+        "-v",
+        "--java-version",
+        type=int,
+        default=17,
+        help="sets java version (default: 17)",
+    )
+    parser.add_argument(
         "--force",
         default=False,
         action="store_true",
@@ -134,7 +141,11 @@ def main():
 
     # CREATE & WRITE
     logger.info("Creating & Writing on Directories and Files...")
-    context: dict[str, str] = {"name": args.name, "group": args.group}
+    context: dict[str, str] = {
+        "name": args.name,
+        "group": args.group,
+        "java_version": str(args.java_version),
+    }
 
     try:
         main_path.mkdir(parents=True, exist_ok=True)

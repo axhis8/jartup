@@ -68,6 +68,7 @@ Creates a folder `my-project/` with package `com.axhislmc`, a Maven build, an in
 | `--maven` | `-m` | Set up Maven Wrapper and `pom.xml` |
 | `--git` | `-g` | Initialize Git repo, add `.gitignore` + `README.md` |
 | `--docker` | `-d` | Add Dockerfile, docker-compose.yml, .dockerignore (automatically enables `--maven`) |
+| `--java-version` | `-v` | Set Java version (defaults to version 17 if not set) |
 | `--force` | | Overwrites an existing folder with the same name (the old project is briefly backed up and restored on failure) |
 
 Without any flags you just get the plain folder structure with `Main.java`.
