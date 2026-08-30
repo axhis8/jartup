@@ -58,8 +58,8 @@ Creates a folder `my-project/` with package `com.axhislmc`, a Maven build, an in
 
 | Argument | Description |
 |---|---|
-| `group` | Group ID, e.g. `com.axhislmc` — determines the package path |
-| `name` | Project name — becomes the folder name and artifact ID |
+| `group` | Group ID, e.g. `com.axhislmc` - determines the package path |
+| `name` | Project name - becomes the folder name and artifact ID |
 
 ### Options
 
