@@ -1,6 +1,7 @@
-import argparse
 import subprocess
+import argparse
 import logging
+import sys
 from os.path import exists
 from pathlib import Path
 
@@ -22,16 +23,25 @@ def main():
     parser.add_argument(
         "-d", "--docker", default=False, action="store_true", help="initialize docker"
     )
+    parser.add_argument(
+        "--force",
+        default=False,
+        action="store_true",
+        help="forces project creation by overwriting file which has the same project name",
+    )
 
     args = parser.parse_args()
     group_items: list[str] = args.group.split(".")
     if len(group_items) != 2:
-        logging.error("Invalid group arguments!")
-        logging.info("Exiting Program...")
-        return
+        logger.error("Invalid group arguments!")
+        sys.exit(1)
 
     # DIRS
     root = Path(args.name)
+    if root.exists() and not args.force:
+        logger.error(f"Project '{args.name}' already exists!")
+        sys.exit(1)
+
     main_dir = (
         root / "src" / "main" / "java" / group_items[0] / group_items[1] / args.name
     )
