@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
 import subprocess
 import argparse
 import logging
 import shutil
 import sys
 from pathlib import Path
+from string import Template
 
 CACHED_DIR_SUFFIX = "_cached"
 
@@ -11,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format="[Jartup] %(levelname)s: %(messag
 logger = logging.getLogger(__name__)
 
 
-def cache_old_dir(root):
+def cache_old_dir(root: Path):
     logger.info("Backing up existing project...")
     cached_path = get_cached_path(root)
 
@@ -38,6 +41,12 @@ def validate_template(template_path: Path, filename: str) -> Path:
         )
 
     return file
+
+
+def render_template(template_path: Path, filename: str, context: dict[str, str]) -> str:
+    file = validate_template(template_path, filename)
+    template = Template(file.read_text(encoding="utf-8"))
+    return template.substitute(context)
 
 
 def rollback(
@@ -105,7 +114,7 @@ def main():
         old_dir_cached = True
 
     package_path = Path(*group_items)
-    template_path = Path(__file__).parent / "templates"
+    template_path = Path(__file__).resolve().parent / "templates"
 
     mvn_path = root / ".mvn"
     main_path = root / "src" / "main" / "java" / package_path
@@ -123,14 +132,18 @@ def main():
     mvnw_cmd_file = root / "mvnw.cmd"
     main_java_file = main_path / "Main.java"
 
-    # CREATE
-    logger.info("Creating Directories and Files...")
+    # CREATE & WRITE
+    logger.info("Creating & Writing on Directories and Files...")
+    context: dict[str, str] = {"name": args.name, "group": args.group}
 
     try:
         main_path.mkdir(parents=True, exist_ok=True)
         test_path.mkdir(parents=True, exist_ok=True)
         resources_path.mkdir(parents=True, exist_ok=True)
-        main_java_file.touch(exist_ok=True)
+
+        main_java_file.write_text(
+            render_template(template_path, "Main.java.tmpl", context), encoding="utf-8"
+        )
 
         if args.maven:
             logger.info("Setting up Maven Build...")
@@ -143,7 +156,11 @@ def main():
             shutil.copy2(mvnw_cmd_template, mvnw_cmd_file)
             shutil.copy2(mvnw_template, mvnw_file)
             mvnw_file.chmod(0o755)
-            pom_file.touch(exist_ok=True)
+
+            pom_file.write_text(
+                render_template(template_path, "pom.xml.tmpl", context),
+                encoding="utf-8",
+            )
 
         if args.git:
             logger.info("Initializing Git...")
@@ -152,21 +169,28 @@ def main():
 
             subprocess.run(["git", "init"], cwd=root)
             shutil.copy2(gitignore_template, gitignore_file)
-            readme_file.touch(exist_ok=True)
+
+            readme_file.write_text(
+                render_template(template_path, "README.md.tmpl", context),
+                encoding="utf-8",
+            )
 
         if args.docker:
             logger.info("Setting up Docker...")
 
             dockerignore_template = validate_template(template_path, ".dockerignore")
+            dockerfile_template = validate_template(template_path, "Dockerfile")
 
             shutil.copy2(dockerignore_template, dockerignore_file)
-            docker_compose_file.touch(exist_ok=True)
-            dockerfile_file.touch(exist_ok=True)
-    except FileNotFoundError as e:
-        rollback(f"Error during project creation: {e}", root, old_dir_cached)
+            shutil.copy2(dockerfile_template, dockerfile_file)
 
-    # WRITING IN FILES - TODO
-    logger.info("Writing in Files...")
+            docker_compose_file.write_text(
+                render_template(template_path, "docker-compose.yml.tmpl", context),
+                encoding="utf-8",
+            )
+
+    except FileNotFoundError as e:
+        rollback(f"Error during project creation/writing: {e}", root, old_dir_cached)
 
     # CLEAN UP
     if old_dir_cached:
