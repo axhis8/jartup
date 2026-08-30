@@ -1,11 +1,12 @@
 import argparse
+import subprocess
 import logging
 from os.path import exists
 from pathlib import Path
 
 
 def setup_logger():
-    logging.basicConfig(level=logging.INFO, format="%[levelname]s: %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     return logging.getLogger(__name__)
 
 
@@ -24,6 +25,10 @@ def main():
 
     args = parser.parse_args()
     group_items: list[str] = args.group.split(".")
+    if len(group_items) != 2:
+        logging.error("Invalid group arguments!")
+        logging.info("Exiting Program...")
+        return
 
     # DIRS
     root = Path(args.name)
@@ -55,10 +60,13 @@ def main():
     pom_file.touch(exist_ok=True)
 
     if args.git:
+        logger.info("Initializing Git...")
+        subprocess.run(["git", "init"], cwd=root)
         gitignore_file.touch(exist_ok=True)
         readme_file.touch(exist_ok=True)
 
     if args.docker:
+        logger.info("Setting up Docker...")
         dockerignore_file.touch(exist_ok=True)
         dockerfile_file.touch(exist_ok=True)
         docker_compose_file.touch(exist_ok=True)
