@@ -46,11 +46,11 @@ def rollback(
     logger.error(error_msg)
 
     if root.exists() and root_is_created:
-        logger.info(f"Cleaning up created directory '{root}'...")
+        logger.info(f"Cleaning up created Directory '{root}'...")
         shutil.rmtree(root)
 
     if old_dir_exists:
-        logger.info("Restoring overwritten directory...")
+        logger.info("Restoring overwritten Directory...")
         shutil.move(get_cached_path(root), root)
 
     sys.exit(1)
@@ -61,7 +61,7 @@ def main():
 
     # ARGS
     parser.add_argument("group", type=str, help="group name (example: 'com.name')")
-    parser.add_argument("name", type=str, help="projekt name")
+    parser.add_argument("name", type=str, help="project name")
     parser.add_argument(
         "-m", "--maven", default=False, action="store_true", help="set up maven build"
     )
