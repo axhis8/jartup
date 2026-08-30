@@ -158,12 +158,9 @@ def main():
             logger.info("Setting up Docker...")
 
             dockerignore_template = validate_template(template_path, ".dockerignore")
-            docker_compose_template = validate_template(
-                template_path, "docker-compose.yml"
-            )
 
             shutil.copy2(dockerignore_template, dockerignore_file)
-            shutil.copy2(docker_compose_template, docker_compose_file)
+            docker_compose_file.touch(exist_ok=True)
             dockerfile_file.touch(exist_ok=True)
     except FileNotFoundError as e:
         rollback(f"Error during project creation: {e}", root, old_dir_cached)
